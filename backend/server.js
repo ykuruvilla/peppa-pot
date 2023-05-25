@@ -1,5 +1,5 @@
-import http from "http";
-import app from "./app/app.js";
+const http = require("http");
+const app = require("./app/app");
 
 //create the server
 const PORT = process.env.port || 8080;

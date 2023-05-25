@@ -1,5 +1,8 @@
-import express from "express";
+require("dotenv").config();
+const express = require("express");
+const dbConnect = require("../config/dbConnect");
 
+dbConnect();
 const app = express();
 
-export default app;
+module.exports = app;
