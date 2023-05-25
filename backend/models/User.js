@@ -23,9 +23,17 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
+const User = mongoose.model("User", UserSchema);
+
+const findUserByEmail = async (email) => {
+  try {
+    const user = await User.findOne({ email });
+    return user;
+  } catch (error) {
+    throw new Error({ message: error });
+  }
+};
 
 //compile the schema to model
 
-const User = mongoose.model("User", UserSchema);
-
-module.exports = User;
+module.exports = { User, findUserByEmail };
