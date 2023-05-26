@@ -1,10 +1,15 @@
 const { User, findUserByEmail } = require("../models/User");
-const { hashPassword, comparePasswords } = require("../helpers/authentication");
-const asyncHandler = require("express-async-handler");
+const {
+  hashPassword,
+  comparePasswords,
+  generateToken,
+  getTokenFromHeader,
+  verifyToken,
+} = require("../helpers/authentication");
+
 // @desc Register User
 // @route POST /api/v1/users/register
 // @access Private/Admin
-
 const registerUserCtrl = async (req, res) => {
   const { fullName, email, password } = req.body;
   const user = await findUserByEmail(email);
@@ -30,14 +35,18 @@ const registerUserCtrl = async (req, res) => {
 // @desc Login User
 // @route POST /api/v1/users/login
 // @access Public
-
 const loginUserCtrl = async (req, res) => {
   const { email, password } = req.body;
   const user = await findUserByEmail(email);
   if (user) {
     const passwordsMatch = await comparePasswords(password, user.password);
     if (passwordsMatch) {
-      return res.status(200).json({ message: "Login successful" });
+      return res.status(200).json({
+        status: "success",
+        message: "Login successful",
+        user,
+        token: generateToken(user._id),
+      });
     } else {
       return res.status(401).json({ message: "Invalid login details" });
     }
@@ -49,4 +58,18 @@ const loginUserCtrl = async (req, res) => {
   res.status(200).json({ message: "Found" });
 };
 
-module.exports = { registerUserCtrl, loginUserCtrl };
+// @desc Get user profile
+// @route POST /api/v1/users/profile
+// @access Private
+const getUserProfile = async (req, res) => {
+  // const token = getTokenFromHeader(req);
+  // if (!token) {
+  //   return res.status(401).json({ message: "Missing JWT" });
+  // }
+  // const verifiedToken = verifyToken(token);
+  // console.log(verifiedToken);
+
+  res.status(200).json({ message: "Welcome to profile page" });
+};
+
+module.exports = { registerUserCtrl, loginUserCtrl, getUserProfile };
