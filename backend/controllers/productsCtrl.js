@@ -73,4 +73,12 @@ const getProducts = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { createNewProduct, getProducts };
+const getProductById = asyncErrorHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    throw new Error("product.found");
+  }
+  res.status(200).json({ message: "Product fetched successfully", product });
+});
+
+module.exports = { createNewProduct, getProducts, getProductById };
