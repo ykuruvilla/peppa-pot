@@ -10,7 +10,7 @@ const {
 // @desc Register User
 // @route POST /api/v1/users/register
 // @access Private/Admin
-const registerUserCtrl = async (req, res) => {
+const registerUser = async (req, res) => {
   const { fullName, email, password } = req.body;
   const user = await findUserByEmail(email);
   if (user) {
@@ -35,7 +35,7 @@ const registerUserCtrl = async (req, res) => {
 // @desc Login User
 // @route POST /api/v1/users/login
 // @access Public
-const loginUserCtrl = async (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
   const user = await findUserByEmail(email);
   if (user) {
@@ -72,4 +72,4 @@ const getUserProfile = async (req, res) => {
   res.status(200).json({ message: "Welcome to profile page" });
 };
 
-module.exports = { registerUserCtrl, loginUserCtrl, getUserProfile };
+module.exports = { registerUser, loginUser, getUserProfile };
