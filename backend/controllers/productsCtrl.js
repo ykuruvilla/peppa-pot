@@ -27,31 +27,50 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
 // @route GET /api/v1/products
 // @access Public
 const getProducts = asyncErrorHandler(async (req, res, next) => {
+  const query = {};
   let productQuery = Product.find();
   if (req.query.name) {
-    productQuery = productQuery.find({
-      name: { $regex: req.query.name, $options: "i" },
-    });
+    query.name = { $regex: req.query.name, $options: "i" };
   }
   if (req.query.brand) {
-    productQuery = productQuery.find({
-      brand: { $regex: req.query.brand, $options: "i" },
-    });
+    query.brand = { $regex: req.query.brand, $options: "i" };
   }
   if (req.query.category) {
-    productQuery = productQuery.find({
-      category: { $regex: req.query.category, $options: "i" },
-    });
+    query.category = { $regex: req.query.category, $options: "i" };
   }
   if (req.query.price) {
     const priceRange = req.query.price.split("-");
-    productQuery = productQuery.find({
-      price: { $gte: priceRange[0], $lte: priceRange[1] },
-    });
+    query.price = { $gte: priceRange[0], $lte: priceRange[1] };
   }
 
-  const products = await productQuery;
-  res.status(200).json({ status: "success", products });
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const limit = parseInt(req.query.limit) || 1;
+  const startIndex = (pageNumber - 1) * limit;
+
+  const [products, totalDocuments] = await Promise.all([
+    Product.find(query).skip(startIndex).limit(limit),
+    Product.countDocuments(query),
+  ]);
+
+  const pagination = {};
+  const endIndex = startIndex + products.length;
+  if (endIndex < totalDocuments) {
+    pagination.next = {
+      pageNumber: pageNumber + 1,
+      limit,
+    };
+    if (startIndex > 0) {
+      pagination.prev = { pageNumber: pageNumber - 1, limit };
+    }
+  }
+  res.status(200).json({
+    status: "success",
+    totalDocuments,
+    documentsReturned: products.length,
+    pagination,
+    message: "Products succesfully fetched",
+    products,
+  });
 });
 
 module.exports = { createNewProduct, getProducts };
