@@ -5,7 +5,7 @@ const {
   generateToken,
   getTokenFromHeader,
   verifyToken,
-} = require("../helpers/authentication");
+} = require("../utils/authentication");
 
 // @desc Register User
 // @route POST /api/v1/users/register

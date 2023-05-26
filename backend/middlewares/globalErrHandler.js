@@ -1,16 +1,16 @@
-const globalErrHandler = (err, _req, res, _next) => {
-  //stack
-  //message
-  const stack = err?.stack;
-  const statusCode = err?.statusCode ? err?.statusCode : 500;
-  const message = err?.message;
-
-  res.status(statusCode).json({ stack, message });
+const CustomError = require("../utils/CustomError");
+const globalErrHandler = (error, _req, res, _next) => {
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || "error";
+  res.status(error.statusCode).json({
+    status: error.statusCode,
+    message: error.message,
+  });
 };
 
 // 404 handler
 const notFound = (req, res, next) => {
-  const err = new Error(`Route ${req.originalUrl} not found`);
+  const err = new CustomError(`Route ${req.originalUrl} not found`, 404);
   next(err);
 };
 
