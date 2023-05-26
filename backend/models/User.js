@@ -4,9 +4,16 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    fullName: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
+    fullName: { type: String, required: [true, "Name is a required field!"] },
+    email: {
+      type: String,
+      required: [true, "Email is a required field!"],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is a required field!"],
+    },
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
     isAdmin: { type: Boolean, default: false },
     hasShippingAddress: { type: Boolean, default: false },
