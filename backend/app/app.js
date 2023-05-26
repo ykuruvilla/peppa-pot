@@ -2,10 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const dbConnect = require("../config/dbConnect");
 const userRoutes = require("../routes/userRoutes");
+const productRoutes = require("../routes/productRoutes");
 const {
   globalErrHandler,
   notFound,
 } = require("../middlewares/globalErrHandler");
+
 dbConnect();
 const app = express();
 app.use(express.json());
@@ -13,6 +15,7 @@ app.use(express.json());
 //routes
 
 app.use("/api/v1/users/", userRoutes);
+app.use("/api/v1/products/", productRoutes);
 
 app.use(notFound);
 app.use(globalErrHandler);

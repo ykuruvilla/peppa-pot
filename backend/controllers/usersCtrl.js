@@ -1,4 +1,6 @@
-const { User, findUserByEmail } = require("../models/User");
+const asyncErrorHandler = require("../middlewares/asyncErrHandler");
+const User = require("../models/User");
+const CustomError = require("../utils/CustomError");
 const {
   hashPassword,
   comparePasswords,
@@ -6,17 +8,20 @@ const {
   getTokenFromHeader,
   verifyToken,
 } = require("../utils/authentication");
+const findDocumentByField = require("../utils/mongo");
 
 // @desc Register User
 // @route POST /api/v1/users/register
 // @access Private/Admin
-const registerUserCtrl = async (req, res) => {
+const registerUser = asyncErrorHandler(async (req, res, next) => {
   const { fullName, email, password } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await findDocumentByField(User, email);
   if (user) {
-    return res
-      .status(409)
-      .json({ message: "User with that email already exists" });
+    const error = new CustomError(
+      `User with email ${email} already exists`,
+      409
+    );
+    return next(error);
   }
 
   const hashedPassword = await hashPassword(password);
@@ -30,14 +35,14 @@ const registerUserCtrl = async (req, res) => {
     message: "User registered successfully",
     data: newUser,
   });
-};
+});
 
 // @desc Login User
 // @route POST /api/v1/users/login
 // @access Public
-const loginUserCtrl = async (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await findDocumentByField(email);
   if (user) {
     const passwordsMatch = await comparePasswords(password, user.password);
     if (passwordsMatch) {
@@ -72,4 +77,4 @@ const getUserProfile = async (req, res) => {
   res.status(200).json({ message: "Welcome to profile page" });
 };
 
-module.exports = { registerUserCtrl, loginUserCtrl, getUserProfile };
+module.exports = { registerUser, loginUser, getUserProfile };
