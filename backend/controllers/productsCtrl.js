@@ -26,9 +26,32 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
 // @desc Get all products
 // @route GET /api/v1/products
 // @access Public
-const getAllProducts = asyncErrorHandler(async (req, res, next) => {
-  const products = await Product.find();
+const getProducts = asyncErrorHandler(async (req, res, next) => {
+  let productQuery = Product.find();
+  if (req.query.name) {
+    productQuery = productQuery.find({
+      name: { $regex: req.query.name, $options: "i" },
+    });
+  }
+  if (req.query.brand) {
+    productQuery = productQuery.find({
+      brand: { $regex: req.query.brand, $options: "i" },
+    });
+  }
+  if (req.query.category) {
+    productQuery = productQuery.find({
+      category: { $regex: req.query.category, $options: "i" },
+    });
+  }
+  if (req.query.price) {
+    const priceRange = req.query.price.split("-");
+    productQuery = productQuery.find({
+      price: { $gte: priceRange[0], $lte: priceRange[1] },
+    });
+  }
+
+  const products = await productQuery;
   res.status(200).json({ status: "success", products });
 });
 
-module.exports = { createNewProduct, getAllProducts };
+module.exports = { createNewProduct, getProducts };

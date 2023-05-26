@@ -1,13 +1,13 @@
 const express = require("express");
 const {
   createNewProduct,
-  getAllProducts,
+  getProducts,
 } = require("../controllers/productsCtrl");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 
 const productRoutes = express.Router();
 
 productRoutes.post("/", isLoggedIn, createNewProduct);
-productRoutes.get("/", getAllProducts);
+productRoutes.get("/", getProducts);
 
 module.exports = productRoutes;
