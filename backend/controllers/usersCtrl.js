@@ -1,6 +1,6 @@
 const { User, findUserByEmail } = require("../models/User");
 const { hashPassword, comparePasswords } = require("../helpers/authentication");
-
+const asyncHandler = require("express-async-handler");
 // @desc Register User
 // @route POST /api/v1/users/register
 // @access Private/Admin
