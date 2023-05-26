@@ -1,6 +1,7 @@
 const asyncErrorHandler = require("../middlewares/asyncErrHandler");
 const Product = require("../models/Product");
 const findDocumentByField = require("../utils/mongo");
+const CustomError = require("../utils/CustomError");
 // @desc Create new product
 // @route POST /api/v1/products
 // @access Private/Admin
@@ -28,7 +29,6 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
 // @access Public
 const getProducts = asyncErrorHandler(async (req, res, next) => {
   const query = {};
-  let productQuery = Product.find();
   if (req.query.name) {
     query.name = { $regex: req.query.name, $options: "i" };
   }
@@ -44,7 +44,7 @@ const getProducts = asyncErrorHandler(async (req, res, next) => {
   }
 
   const pageNumber = parseInt(req.query.pageNumber) || 1;
-  const limit = parseInt(req.query.limit) || 1;
+  const limit = parseInt(req.query.limit) || 0;
   const startIndex = (pageNumber - 1) * limit;
 
   const [products, totalDocuments] = await Promise.all([
@@ -73,12 +73,67 @@ const getProducts = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+// @desc Get single product
+// @route GET /api/v1/products/:id
+// @access Public
 const getProductById = asyncErrorHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  console.log("hi");
+  const { id } = req.params;
+  const product = await Product.findById(id);
   if (!product) {
-    throw new Error("product.found");
+    const error = new CustomError(`Product with id ${id} does not exist`, 404);
+    return next(error);
   }
   res.status(200).json({ message: "Product fetched successfully", product });
 });
 
-module.exports = { createNewProduct, getProducts, getProductById };
+// @desc update product
+// @route PUT /api/v1/products/:id
+// @access Private/Admin
+const updateProduct = asyncErrorHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { name, description, brand, category, user, price, totalQty } =
+    req.body;
+  const product = await Product.findByIdAndUpdate(
+    id,
+    {
+      name,
+      description,
+      brand,
+      category,
+      user,
+      price,
+      totalQty,
+    },
+    { new: true }
+  );
+
+  if (!product) {
+    const error = new CustomError(`Product with id ${id} does not exist`, 404);
+    return next(error);
+  }
+  res.status(200).json({
+    message: "Product sucessfully updated",
+    status: "Success",
+    product,
+  });
+});
+
+const deleteProduct = asyncErrorHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const deletedProduct = await Product.findByIdAndDelete(id);
+  if (!deletedProduct) {
+    const error = new CustomError(`Product with id ${id} does not exist`, 404);
+    return next(error);
+  }
+
+  res.status(204).send();
+});
+
+module.exports = {
+  createNewProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+};
