@@ -2,10 +2,10 @@ const asyncErrorHandler = require("../middlewares/asyncErrHandler");
 const Product = require("../models/Product");
 const findDocumentByField = require("../utils/mongo");
 const CustomError = require("../utils/CustomError");
+
 // @desc Create new product
 // @route POST /api/v1/products
 // @access Private/Admin
-
 const createNewProduct = asyncErrorHandler(async (req, res, next) => {
   const { name, description, brand, category, user, price, totalQty } =
     req.body;
@@ -77,7 +77,6 @@ const getProducts = asyncErrorHandler(async (req, res, next) => {
 // @route GET /api/v1/products/:id
 // @access Public
 const getProductById = asyncErrorHandler(async (req, res, next) => {
-  console.log("hi");
   const { id } = req.params;
   const product = await Product.findById(id);
   if (!product) {

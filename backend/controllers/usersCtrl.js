@@ -1,5 +1,5 @@
 const asyncErrorHandler = require("../middlewares/asyncErrHandler");
-const User = require("../models/User");
+const { User } = require("../models/User");
 const CustomError = require("../utils/CustomError");
 const {
   hashPassword,
@@ -15,7 +15,7 @@ const findDocumentByField = require("../utils/mongo");
 // @access Private/Admin
 const registerUser = asyncErrorHandler(async (req, res, next) => {
   const { fullName, email, password } = req.body;
-  const user = await findDocumentByField(User, email);
+  const user = await User.findOne({ email });
   if (user) {
     const error = new CustomError(
       `User with email ${email} already exists`,
@@ -42,7 +42,7 @@ const registerUser = asyncErrorHandler(async (req, res, next) => {
 // @access Public
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  const user = await findDocumentByField(email);
+  const user = await User.findOne({ email });
   if (user) {
     const passwordsMatch = await comparePasswords(password, user.password);
     if (passwordsMatch) {
@@ -67,6 +67,7 @@ const loginUser = async (req, res) => {
 // @route POST /api/v1/users/profile
 // @access Private
 const getUserProfile = async (req, res) => {
+  console.log("hi");
   // const token = getTokenFromHeader(req);
   // if (!token) {
   //   return res.status(401).json({ message: "Missing JWT" });
