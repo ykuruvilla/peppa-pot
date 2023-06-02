@@ -2,6 +2,7 @@ const asyncErrorHandler = require("../middlewares/asyncErrHandler");
 const Product = require("../models/Product");
 const findDocumentByField = require("../utils/mongo");
 const CustomError = require("../utils/CustomError");
+const Category = require("../models/Category");
 
 // @desc Create new product
 // @route POST /api/v1/products
@@ -9,6 +10,24 @@ const CustomError = require("../utils/CustomError");
 const createNewProduct = asyncErrorHandler(async (req, res, next) => {
   const { name, description, brand, category, user, price, totalQty } =
     req.body;
+
+  const duplicateProduct = await Product.findOne({ name });
+  if (duplicateProduct) {
+    const error = new CustomError(
+      `Product with the name ${name} already exists`,
+      409
+    );
+    return next(error);
+  }
+
+  const productCategory = await Category.findOne({ name: category });
+  if (!productCategory) {
+    const error = new CustomError(
+      `Category with name ${category} not found. Please double check the name or create a new category first.`,
+      404
+    );
+    return next(error);
+  }
 
   const newProduct = await Product.create({
     name,
@@ -21,6 +40,9 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
   });
 
   //push the product into category
+  productCategory.products.push(newProduct._id);
+  await productCategory.save();
+
   res.status(201).json({ message: "Product created succesfully", newProduct });
 });
 
@@ -118,6 +140,9 @@ const updateProduct = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+// @desc delete product
+// @route DELETE /api/v1/products/:id
+// @access Private/Admin
 const deleteProduct = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
   const deletedProduct = await Product.findByIdAndDelete(id);

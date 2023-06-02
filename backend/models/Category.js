@@ -15,7 +15,7 @@ const CategorySchema = new Schema(
       default: "https://picsum.photos/200/300",
       required: true,
     },
-    products: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
   { timestamps: true }
 );
