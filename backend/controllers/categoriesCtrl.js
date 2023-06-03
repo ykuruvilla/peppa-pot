@@ -9,7 +9,10 @@ const createNewCategory = asyncErrorHandler(async (req, res, next) => {
   const { name } = req.body;
   const category = await Category.findOne({ name });
   if (category) {
-    const error = new CustomError(`Category with name ${name} already exists`);
+    const error = new CustomError(
+      `Category with name ${name} already exists`,
+      409
+    );
     return next(error);
   }
   const newCategory = await Category.create({ name, user: req.userAuthId });
@@ -29,7 +32,7 @@ const getAllCategories = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Categories fetched successfully",
-    categories: categories,
+    categories,
   });
 });
 
@@ -46,7 +49,7 @@ const getCategoryById = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Category fetched successfully",
-    category: category,
+    category,
   });
 });
 
@@ -78,13 +81,11 @@ const updateCategoryById = asyncErrorHandler(async (req, res, next) => {
     const error = new CustomError(`Category with id ${id} does not exist`, 409);
     return next(error);
   }
-  res
-    .status(200)
-    .json({
-      message: "Category successfully updated",
-      status: "success",
-      category: updatedCategory,
-    });
+  res.status(200).json({
+    message: "Category successfully updated",
+    status: "success",
+    category: updatedCategory,
+  });
 });
 
 module.exports = {
