@@ -37,8 +37,8 @@ const getAllBrands = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-// @desc Get single category
-// @route GET /api/v1/categories/id
+// @desc Get single brand
+// @route GET /api/v1/brands/id
 // @access Public
 const getBrandById = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
@@ -54,4 +54,45 @@ const getBrandById = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { createNewBrand, getAllBrands, getBrandById };
+// @desc Delete single brand
+// @route DELETE /api/v1/brands/id
+// @access Private/Admin
+const deleteBrandById = asyncErrorHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const deletedBrand = await Brand.findByIdAndDelete(id);
+  if (!deletedBrand) {
+    const error = new CustomError(`Brand with id ${id} does not exist`, 409);
+    return next(error);
+  }
+  res.status(204).send();
+});
+
+// @desc Update single brand
+// @route PUT /api/v1/brands/id
+// @access Private/Admin
+const updateBrandById = asyncErrorHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const updatedBrand = await Brand.findByIdAndUpdate(
+    id,
+    { name },
+    { new: true }
+  );
+  if (!updatedBrand) {
+    const error = new CustomError(`Brand with id ${id} does not exist`, 409);
+    return next(error);
+  }
+  res.status(200).json({
+    message: "Brand successfully updated",
+    status: "success",
+    brand: updatedBrand,
+  });
+});
+
+module.exports = {
+  createNewBrand,
+  getAllBrands,
+  getBrandById,
+  deleteBrandById,
+  updateBrandById,
+};
