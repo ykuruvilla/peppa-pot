@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 const findDocumentByField = require("../utils/mongo");
 const CustomError = require("../utils/CustomError");
 const Category = require("../models/Category");
+const Brand = require("../models/Brand");
 
 // @desc Create new product
 // @route POST /api/v1/products
@@ -29,6 +30,15 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
+  const productBrand = await Brand.findOne({ name: brand });
+  if (!productBrand) {
+    const error = new CustomError(
+      `Brand with name ${brand} not found. Please double check the name or create a new brand first.`,
+      404
+    );
+    return next(error);
+  }
+
   const newProduct = await Product.create({
     name,
     description,
@@ -42,6 +52,8 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
   //push the product into category
   productCategory.products.push(newProduct._id);
   await productCategory.save();
+  productBrand.products.push(newProduct._id);
+  await productBrand.save();
 
   res.status(201).json({ message: "Product created succesfully", newProduct });
 });
