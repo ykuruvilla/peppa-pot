@@ -37,4 +37,21 @@ const getAllBrands = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { createNewBrand, getAllBrands };
+// @desc Get single category
+// @route GET /api/v1/categories/id
+// @access Public
+const getBrandById = asyncErrorHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const brand = await Brand.findById(id);
+  if (!brand) {
+    const error = new CustomError(`Brand with id ${id} does not exist`, 409);
+    return next(error);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Category fetched successfully",
+    brand,
+  });
+});
+
+module.exports = { createNewBrand, getAllBrands, getBrandById };
