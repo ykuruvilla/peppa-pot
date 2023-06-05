@@ -4,6 +4,6 @@ const isLoggedIn = require("../middlewares/isLoggedIn");
 
 const reviewRoutes = express.Router();
 
-reviewRoutes.post("/", isLoggedIn, createNewReview);
+reviewRoutes.post("/:productId", isLoggedIn, createNewReview);
 
 module.exports = reviewRoutes;
