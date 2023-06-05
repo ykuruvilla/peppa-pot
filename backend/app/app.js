@@ -9,6 +9,7 @@ const {
   notFound,
 } = require("../middlewares/globalErrHandler");
 const brandRoutes = require("../routes/brandRoutes");
+const reviewRoutes = require("../routes/reviewRoutes");
 
 dbConnect();
 const app = express();
@@ -20,6 +21,8 @@ app.use("/api/v1/users/", userRoutes);
 app.use("/api/v1/products/", productRoutes);
 app.use("/api/v1/categories/", categoryRoutes);
 app.use("/api/v1/brands/", brandRoutes);
+app.use("/api/v1/reviews/", reviewRoutes);
+
 app.use(notFound);
 app.use(globalErrHandler);
 

@@ -13,9 +13,10 @@ const ProductSchema = new Schema(
       type: String,
       required: [true, "Description is a required field"],
     },
-    brand: { type: String, required: [true, "Name is a required field"] },
+    brand: { type: String, required: [true, "Brand is a required field"] },
     category: {
       type: String,
+      ref: "Category",
       required: [true, "Category is a required field"],
     },
     user: {
@@ -24,7 +25,7 @@ const ProductSchema = new Schema(
       ref: "User",
     },
     image: { type: String, default: "https://via.placesholder.com/150" },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     price: { type: Number, required: [true, "Price is a required field"] },
     totalQty: {
       type: Number,
@@ -38,6 +39,18 @@ const ProductSchema = new Schema(
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );
+
+//Virtuals
+//Average rating
+ProductSchema.virtual("averageRating").get(function () {
+  const totalReviews = this.reviews.length;
+  const totalRating = this.reviews.reduce(
+    (acc, review) => acc + review.rating,
+    0
+  );
+  const averageRating = totalRating / totalReviews;
+  return averageRating;
+});
 
 const Product = mongoose.model("Product", ProductSchema);
 

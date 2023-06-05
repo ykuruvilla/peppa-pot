@@ -82,7 +82,7 @@ const getProducts = asyncErrorHandler(async (req, res, next) => {
   const startIndex = (pageNumber - 1) * limit;
 
   const [products, totalDocuments] = await Promise.all([
-    Product.find(query).skip(startIndex).limit(limit),
+    Product.find(query).populate("reviews").skip(startIndex).limit(limit),
     Product.countDocuments(query),
   ]);
 
@@ -112,7 +112,7 @@ const getProducts = asyncErrorHandler(async (req, res, next) => {
 // @access Public
 const getProductById = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
-  const product = await Product.findById(id);
+  const product = await Product.findById(id).populate("reviews");
   if (!product) {
     const error = new CustomError(`Product with id ${id} does not exist`, 404);
     return next(error);
