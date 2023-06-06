@@ -67,13 +67,15 @@ const loginUser = async (req, res) => {
 // @route POST /api/v1/users/profile
 // @access Private
 const getUserProfile = async (req, res) => {
-  // const token = getTokenFromHeader(req);
-  // if (!token) {
-  //   return res.status(401).json({ message: "Missing JWT" });
-  // }
-  // const verifiedToken = verifyToken(token);
+  const user = await User.findById(req.userAuthId).populate("orders");
 
-  res.status(200).json({ message: "Welcome to profile page" });
+  res
+    .status(200)
+    .json({
+      status: "success",
+      message: "Profile successfully retrieved",
+      user,
+    });
 };
 
 module.exports = { registerUser, loginUser, getUserProfile };

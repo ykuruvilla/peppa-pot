@@ -19,7 +19,6 @@ const OrderSchema = new Schema(
     paymentStatus: {
       type: String,
       required: true,
-      enum: ["payment pending", "Paid"],
       default: "payment pending",
     },
     paymentMethod: { type: String, required: true, default: "not specified" },
