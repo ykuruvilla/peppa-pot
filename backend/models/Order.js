@@ -14,7 +14,6 @@ const OrderSchema = new Schema(
     shippingAddress: { type: Object, required: true },
     orderNumber: {
       type: String,
-      required: true,
       unique: true,
     },
     paymentStatus: {
@@ -25,6 +24,7 @@ const OrderSchema = new Schema(
     },
     paymentMethod: { type: String, required: true, default: "not specified" },
     currency: { type: String, reuired: true, default: "not specified" },
+    totalPrice: { type: Number, required: true, default: 0 },
     status: {
       type: String,
       required: "true",
@@ -42,6 +42,32 @@ OrderSchema.pre("save", function (next) {
   }
   next();
 });
+
+OrderSchema.statics.updateProductQuantities = async function (orderItems) {
+  const orderedProductIds = orderItems.map((item) => item._id);
+
+  const orderedProducts = await this.model("Product").find({
+    _id: { $in: orderedProductIds },
+  });
+
+  for (const orderedProduct of orderedProducts) {
+    const orderedProductId = orderedProduct._id;
+
+    const orderedItem = orderItems.find(
+      (item) => item._id.toString() === orderedProductId.toString()
+    );
+
+    const orderedQuantity = orderedItem.totalBoughtQty;
+    const newTotalQty = orderedProduct.totalQty - orderedQuantity;
+    const newTotalSold = orderedProduct.totalSold + orderedQuantity;
+
+    await this.model("Product").updateOne(
+      { _id: orderedProductId },
+      { totalQty: newTotalQty },
+      { totalSold: newTotalSold }
+    );
+  }
+};
 
 const Order = mongoose.model("Order", OrderSchema);
 
