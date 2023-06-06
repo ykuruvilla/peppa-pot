@@ -18,25 +18,7 @@ const stripe = require("stripe")(stripeKey);
 dbConnect();
 const app = express();
 
-// server.js
-//
-// Use this sample code to handle webhook events in your integration.
-//
-// 1) Paste this code into a new file (server.js)
-//
-// 2) Install dependencies
-//   npm install stripe
-//   npm install express
-//
-// 3) Run the server on http://localhost:4242
-//   node server.js
-
-// The library needs to be configured with your account's secret key.
-// Ensure the key is kept out of any version control system you might be using.
-
-// This is your Stripe CLI webhook secret for testing your endpoint locally.
-const endpointSecret =
-  "whsec_854204b0f1e154b5c3850034d6b3b7b6f077ad0f758ce93723675bfb9d9366c9";
+const endpointSecret = process.env.WEBHOOK_ENDPOINT_SECRET;
 
 app.post(
   "/webhook",
