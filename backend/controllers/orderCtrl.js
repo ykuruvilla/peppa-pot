@@ -36,6 +36,7 @@ const createNewOrder = asyncErrorHandler(async (req, res, next) => {
 
   const session = await stripe.checkout.sessions.create({
     line_items: stripeFormattedOrders,
+    metadata: { orderId: JSON.stringify(newOrder._id) },
     mode: "payment",
     success_url: "http://localhost:3000/success",
     cancel_url: "http://localhost:3000/success",
