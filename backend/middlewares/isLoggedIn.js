@@ -11,9 +11,6 @@ const isLoggedIn = async (req, res, next) => {
       401
     );
     return next(error);
-  } else if (!user.isAdmin) {
-    const error = new CustomError("User must have admin privileges", 401);
-    return next(error);
   } else {
     req.user = user;
     req.userAuthId = decodedUser.id;
