@@ -24,7 +24,7 @@ const ProductSchema = new Schema(
       required: [true, "User is a required field"],
       ref: "User",
     },
-    image: { type: String, default: "https://via.placesholder.com/150" },
+    images: [{ type: String, required: true }],
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     price: { type: Number, required: [true, "Price is a required field"] },
     totalQty: {
