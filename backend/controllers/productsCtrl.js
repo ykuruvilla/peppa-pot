@@ -9,9 +9,10 @@ const Brand = require("../models/Brand");
 // @route POST /api/v1/products
 // @access Private/Admin
 const createNewProduct = asyncErrorHandler(async (req, res, next) => {
+  const images = req.files;
+  const imagePaths = images.map((image) => image.path);
   const { name, description, brand, category, user, price, totalQty } =
     req.body;
-
   const duplicateProduct = await Product.findOne({ name });
   if (duplicateProduct) {
     const error = new CustomError(
@@ -20,7 +21,6 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
     );
     return next(error);
   }
-
   const productCategory = await Category.findOne({ name: category });
   if (!productCategory) {
     const error = new CustomError(
@@ -29,7 +29,6 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
     );
     return next(error);
   }
-
   const productBrand = await Brand.findOne({ name: brand });
   if (!productBrand) {
     const error = new CustomError(
@@ -38,7 +37,6 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
     );
     return next(error);
   }
-
   const newProduct = await Product.create({
     name,
     description,
@@ -47,14 +45,13 @@ const createNewProduct = asyncErrorHandler(async (req, res, next) => {
     user: req.userAuthId,
     price,
     totalQty,
+    images: imagePaths,
   });
-
   //push the product into category
   productCategory.products.push(newProduct._id);
   await productCategory.save();
   productBrand.products.push(newProduct._id);
   await productBrand.save();
-
   res.status(201).json({ message: "Product created succesfully", newProduct });
 });
 
