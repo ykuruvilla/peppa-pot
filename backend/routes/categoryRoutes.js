@@ -7,12 +7,13 @@ const {
   updateCategoryById,
 } = require("../controllers/categoriesCtrl");
 const isLoggedIn = require("../middlewares/isLoggedIn");
+const isAdmin = require("../middlewares/isAdmin");
 
 const categoryRoutes = express.Router();
 
-categoryRoutes.post("/", isLoggedIn, createNewCategory);
+categoryRoutes.post("/", isLoggedIn, isAdmin, createNewCategory);
 categoryRoutes.get("/", getAllCategories);
 categoryRoutes.get("/:id", getCategoryById);
-categoryRoutes.delete("/:id", isLoggedIn, deleteCategoryById);
-categoryRoutes.put("/:id", isLoggedIn, updateCategoryById);
+categoryRoutes.delete("/:id", isLoggedIn, isAdmin, deleteCategoryById);
+categoryRoutes.put("/:id", isLoggedIn, isAdmin, updateCategoryById);
 module.exports = categoryRoutes;
